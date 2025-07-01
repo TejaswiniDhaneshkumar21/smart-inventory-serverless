@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spoilage Assessments - Smart Inventory</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; margin: 2px; text-decoration: none; border: none; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .risk-high { color: red; font-weight: bold; }
+        .risk-medium { color: orange; font-weight: bold; }
+        .risk-low { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Spoilage Assessments</h1>
+    <a href="{% url 'spoilageassessment_create' %}" class="btn btn-primary">New Assessment</a>
+    
+    {% if assessments %}
+    <table>
+        <thead>
+            <tr>
+                <th>Raw Material</th>
+                <th>Assessment Date</th>
+                <th>Temperature (°C)</th>
+                <th>Days Stored</th>
+                <th>Spoilage Risk</th>
+                <th>Notification</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assessment in assessments %}
+            <tr>
+                <td>{{ assessment.raw_material.name }}</td>
+                <td>{{ assessment.assessment_date }}</td>
+                <td>{{ assessment.avg_temp }}</td>
+                <td>{{ assessment.days_stored }}</td>
+                <td>
+                    {% if assessment.spoilage_risk >= 70 %}
+                        <span class="risk-high">{{ assessment.spoilage_risk|floatformat:1 }}% HIGH</span>
+                    {% elif assessment.spoilage_risk >= 40 %}
+                        <span class="risk-medium">{{ assessment.spoilage_risk|floatformat:1 }}% MEDIUM</span>
+                    {% else %}
+                        <span class="risk-low">{{ assessment.spoilage_risk|floatformat:1 }}% LOW</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if assessment.notification_sent %}
+                        <span style="color: green;">Sent</span>
+                    {% else %}
+                        <span style="color: gray;">Not Sent</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'spoilageassessment_update' pk=assessment.pk %}" class="btn btn-secondary">Edit</a>
+                    <form method="POST" action="{% url 'spoilageassessment_delete' pk=assessment.pk %}" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this assessment?')">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No assessments found. <a href="{% url 'spoilageassessment_create' %}">Create your first assessment</a></p>
+    {% endif %}
+    
+    <p><a href="{% url 'dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

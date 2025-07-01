@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Stock Entries</h2>
+    <a href="{% url 'stockentry_create' %}" class="btn">Add Stock Entry</a>
+    <table id="dataTable">
+        <tr><th>Product</th><th>Quantity</th><th>Date Added</th><th>Actions</th></tr>
+        {% for stockentry in stockentries %}
+            <tr>
+                <td>{{ stockentry.product }}</td>
+                <td>{{ stockentry.quantity }}</td>
+                <td>{{ stockentry.date_added }}</td>
+                <td>
+                    <a href="{% url 'stockentry_update' stockentry.pk %}" class="btn btn-small">Edit</a>
+                    <a href="{% url 'stockentry_delete' stockentry.pk %}" class="btn btn-small btn-danger">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

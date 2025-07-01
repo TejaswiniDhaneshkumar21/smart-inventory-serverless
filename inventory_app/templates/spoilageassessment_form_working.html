@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if form.instance.pk %}Edit{% else %}New{% endif %} Spoilage Assessment - Smart Inventory</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"], select { 
+            width: 300px; padding: 8px; border: 1px solid #ddd; 
+        }
+        .btn { padding: 10px 20px; margin: 5px; text-decoration: none; border: none; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .error { color: red; font-size: 12px; }
+        .info { background: #e7f3ff; padding: 10px; border-left: 4px solid #007bff; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>{% if form.instance.pk %}Edit Spoilage Assessment{% else %}New Spoilage Assessment{% endif %}</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.raw_material.id_for_label }}">Raw Material:</label>
+            <select name="{{ form.raw_material.name }}" id="{{ form.raw_material.id_for_label }}" required>
+                <option value="">Select a raw material</option>
+                {% for choice in form.raw_material.field.queryset %}
+                    <option value="{{ choice.pk }}" {% if form.raw_material.value == choice.pk %}selected{% endif %}>
+                        {{ choice.name }} ({{ choice.batch_id }}) - Expires: {{ choice.expiry }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if form.raw_material.errors %}
+                <div class="error">
+                    {% for error in form.raw_material.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.avg_temp.id_for_label }}">Average Temperature (°C):</label>
+            <input type="number" 
+                   name="{{ form.avg_temp.name }}" 
+                   id="{{ form.avg_temp.id_for_label }}"
+                   step="0.1" min="-50" max="100"
+                   value="{{ form.avg_temp.value|default:'25.0' }}"
+                   required>
+            <div class="info">
+                <strong>Temperature Guidelines:</strong><br>
+                • 2-8°C: Optimal for most perishables<br>
+                • 8-25°C: Room temperature storage<br>
+                • >25°C: Higher spoilage risk
+            </div>
+            {% if form.avg_temp.errors %}
+                <div class="error">
+                    {% for error in form.avg_temp.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.days_stored.id_for_label }}">Days Stored:</label>
+            <input type="number" 
+                   name="{{ form.days_stored.name }}" 
+                   id="{{ form.days_stored.id_for_label }}"
+                   min="0" max="3650"
+                   value="{{ form.days_stored.value|default:'0' }}"
+                   required>
+            {% if form.days_stored.errors %}
+                <div class="error">
+                    {% for error in form.days_stored.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if form.instance.pk and form.instance.spoilage_risk %}
+        <div class="form-group">
+            <label>Current Spoilage Risk:</label>
+            <div style="padding: 10px; background: #f8f9fa; border: 1px solid #ddd;">
+                {% if form.instance.spoilage_risk >= 70 %}
+                    <span style="color: red; font-weight: bold; font-size: 18px;">{{ form.instance.spoilage_risk|floatformat:1 }}% HIGH RISK</span>
+                {% elif form.instance.spoilage_risk >= 40 %}
+                    <span style="color: orange; font-weight: bold; font-size: 18px;">{{ form.instance.spoilage_risk|floatformat:1 }}% MEDIUM RISK</span>
+                {% else %}
+                    <span style="color: green; font-weight: bold; font-size: 18px;">{{ form.instance.spoilage_risk|floatformat:1 }}% LOW RISK</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if form.non_field_errors %}
+            <div class="error">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div>
+            <input type="submit" value="{% if form.instance.pk %}Update Assessment{% else %}Calculate Risk{% endif %}" class="btn btn-primary">
+            <a href="{% url 'spoilageassessment_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+    
+    <div class="info" style="margin-top: 20px;">
+        <strong>Note:</strong> When spoilage risk reaches 70% or higher, automatic email notifications will be sent to alert you of materials requiring immediate attention.
+    </div>
+</body>
+</html>

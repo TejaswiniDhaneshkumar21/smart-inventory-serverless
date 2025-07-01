@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>{{ product|yesno:'Update Product,Add Product' }}</h2>
+    <form method="post" id="productForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Save</button>
+    </form>
+    <div id="error-message" class="error"></div>
+{% endblock %}

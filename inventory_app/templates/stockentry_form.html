@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>{{ stockentry|yesno:'Update Stock Entry,Add Stock Entry' }}</h2>
+    <form method="post" id="stockentryForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Save</button>
+    </form>
+    <div id="error-message" class="error"></div>
+{% endblock %}

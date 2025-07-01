@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Smart Inventory{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'supplier_list' %}">Suppliers</a></li>
+                <li><a href="{% url 'rawmaterial_list' %}">Raw Materials</a></li>
+                <li><a href="{% url 'spoilageassessment_list' %}">Spoilage Assessments</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

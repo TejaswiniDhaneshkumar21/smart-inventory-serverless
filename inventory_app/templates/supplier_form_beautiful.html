@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Supplier - Smart Inventory</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8fafc; color: #2d3748; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem; }
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; }
+        .card { background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 2rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; }
+        input[type="text"], input[type="email"], input[type="number"] { 
+            width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 6px; 
+            font-size: 1rem; transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: #4299e1; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #4299e1; color: white; }
+        .btn-primary:hover { background: #3182ce; }
+        .btn-secondary { background: #718096; color: white; }
+        .btn-secondary:hover { background: #4a5568; }
+        .error { color: #f56565; font-size: 0.875rem; margin-top: 0.25rem; }
+        .nav-link { color: #4299e1; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+        .help-text { font-size: 0.875rem; color: #718096; margin-top: 0.25rem; }
+        .actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %}"></i>
+                {% if form.instance.pk %}Edit Supplier{% else %}Add New Supplier{% endif %}
+            </h1>
+            <p>{% if form.instance.pk %}Update supplier information{% else %}Add a new supplier to your network{% endif %}</p>
+        </div>
+        
+        <a href="{% url 'supplier_list' %}" class="nav-link"><i class="fas fa-arrow-left"></i> Back to Suppliers</a>
+        
+        <div class="card">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">
+                        <i class="fas fa-building"></i> Supplier Name
+                    </label>
+                    <input type="text" 
+                           name="{{ form.name.name }}" 
+                           id="{{ form.name.id_for_label }}"
+                           value="{{ form.name.value|default:'' }}"
+                           placeholder="Enter supplier company name"
+                           required>
+                    {% if form.name.errors %}
+                        <div class="error">
+                            {% for error in form.name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" 
+                           name="{{ form.email.name }}" 
+                           id="{{ form.email.id_for_label }}"
+                           value="{{ form.email.value|default:'' }}"
+                           placeholder="supplier@company.com"
+                           required>
+                    {% if form.email.errors %}
+                        <div class="error">
+                            {% for error in form.email.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.reliability_score.id_for_label }}">
+                        <i class="fas fa-star"></i> Reliability Score (0-100)
+                    </label>
+                    <input type="number" 
+                           name="{{ form.reliability_score.name }}" 
+                           id="{{ form.reliability_score.id_for_label }}"
+                           min="0" max="100" step="0.1"
+                           value="{{ form.reliability_score.value|default:'' }}"
+                           placeholder="85.0"
+                           required>
+                    <div class="help-text">
+                        Rate the supplier's reliability: 80-100 (Excellent), 60-79 (Good), 0-59 (Needs Improvement)
+                    </div>
+                    {% if form.reliability_score.errors %}
+                        <div class="error">
+                            {% for error in form.reliability_score.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if form.non_field_errors %}
+                    <div class="error">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="actions">
+                    <input type="submit" value="{% if form.instance.pk %}Update Supplier{% else %}Add Supplier{% endif %}" class="btn btn-primary">
+                    <a href="{% url 'supplier_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

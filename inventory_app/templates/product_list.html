@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Products</h2>
+    <a href="{% url 'product_create' %}" class="btn">Add Product</a>
+    <table id="dataTable">
+        <tr><th>Name</th><th>Production Date</th><th>Actions</th></tr>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.production_date }}</td>
+                <td>
+                    <a href="{% url 'product_update' product.pk %}" class="btn btn-small">Edit</a>
+                    <a href="{% url 'product_delete' product.pk %}" class="btn btn-small btn-danger">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

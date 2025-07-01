@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Suppliers - Smart Inventory</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">Smart Inventory</div>
+            <div class="user-section">
+                <span>Welcome, {{ request.user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout">Logout</a>
+            </div>
+        </header>
+        <aside class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'supplier_list' %}" class="active">Suppliers</a></li>
+                <li><a href="{% url 'rawmaterial_list' %}">Raw Materials</a></li>
+                <li><a href="{% url 'spoilageassessment_list' %}">Spoilage Assessments</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <h1>Suppliers</h1>
+            <div class="card">
+                <ul>
+                    {% for supplier in suppliers %}
+                        <li>{{ supplier.name }} 
+                            <a href="{% url 'supplier_update' pk=supplier.pk %}" class="btn btn-primary btn-small">Edit</a>
+                            <form action="{% url 'supplier_delete' pk=supplier.pk %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-small">Delete</button>
+                            </form>
+                        </li>
+                    {% empty %}
+                        <li>No suppliers found.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'supplier_create' %}" class="btn btn-primary">Add Supplier</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
