@@ -35,19 +35,18 @@ jobs:
         docker push $IMAGE_URI
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-    - name: Fill in the new image ID in the ECS task definition
-      run: |
-        sed -i "s|<IMAGE_URI>|${{ env.IMAGE_URI }}|" ecs-task-def.json
 
-    - name: Register ECS Task Definition
-      id: register-task-def
+    - name: Fetch current task definition ARN from ECS service
+      id: get-task-def
       run: |
-        TASK_DEF_ARN=$(aws ecs register-task-definition \
-          --cli-input-json file://ecs-task-def.json \
-          --query "taskDefinition.taskDefinitionArn" --output text)
+        TASK_DEF_ARN=$(aws ecs describe-services \
+          --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+          --services ${{ secrets.ECS_SERVICE_NAME }} \
+          --query "services[0].taskDefinition" \
+          --output text)
         echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
 
-    - name: Deploy to ECS Service
+    - name: Deploy to ECS Service (Force New Deployment)
       run: |
         aws ecs update-service \
           --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
