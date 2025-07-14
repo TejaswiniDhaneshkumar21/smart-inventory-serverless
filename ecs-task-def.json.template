@@ -4,7 +4,7 @@
   "containerDefinitions": [
     {
       "name": "django-app",
-      "image": "<IMAGE_URI>",
+      "image": "421596951598.dkr.ecr.us-east-1.amazonaws.com/smart-inventory-cpp",
       "essential": true,
       "portMappings": [
         {
