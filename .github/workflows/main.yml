@@ -6,7 +6,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Django to AWS Fargate
     runs-on: ubuntu-latest
 
     steps:
@@ -35,9 +34,26 @@ jobs:
         docker push $IMAGE_URI
         echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
-    - name: Fill in the new image ID in the ECS task definition
+    - name: Prepare ECS Task Definition from Template
+      env:
+        IMAGE_URI: ${{ env.IMAGE_URI }}
+        AWS_STORAGE_BUCKET_NAME: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
+        AWS_S3_REGION_NAME: ${{ secrets.AWS_S3_REGION_NAME }}
+        AWS_SNS_TOPIC_ARN: ${{ secrets.AWS_SNS_TOPIC_ARN }}
+        AWS_DYNAMODB_TABLE: ${{ secrets.AWS_DYNAMODB_TABLE }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        AWS_SQS_QUEUE_URL: ${{ secrets.AWS_SQS_QUEUE_URL }}
+        TASK_EXECUTION_ROLE_ARN: ${{ secrets.TASK_EXECUTION_ROLE_ARN }}
       run: |
-        sed -i "s|<IMAGE_URI>|${{ env.IMAGE_URI }}|" ecs-task-def.json
+        cp ecs-task-def.json.template ecs-task-def.json
+        sed -i "s|<IMAGE_URI>|$IMAGE_URI|g" ecs-task-def.json
+        sed -i "s|<AWS_STORAGE_BUCKET_NAME>|$AWS_STORAGE_BUCKET_NAME|g" ecs-task-def.json
+        sed -i "s|<AWS_S3_REGION_NAME>|$AWS_S3_REGION_NAME|g" ecs-task-def.json
+        sed -i "s|<AWS_SNS_TOPIC_ARN>|$AWS_SNS_TOPIC_ARN|g" ecs-task-def.json
+        sed -i "s|<AWS_DYNAMODB_TABLE>|$AWS_DYNAMODB_TABLE|g" ecs-task-def.json
+        sed -i "s|<AWS_DEFAULT_REGION>|$AWS_DEFAULT_REGION|g" ecs-task-def.json
+        sed -i "s|<AWS_SQS_QUEUE_URL>|$AWS_SQS_QUEUE_URL|g" ecs-task-def.json
+        sed -i "s|<TASK_EXECUTION_ROLE_ARN>|$TASK_EXECUTION_ROLE_ARN|g" ecs-task-def.json
 
     - name: Register ECS Task Definition
       id: register-task-def
