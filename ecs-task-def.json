@@ -1,0 +1,22 @@
+{
+  "family": "smart-invenroty-defination",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "django-app",
+      "image": "421596951598.dkr.ecr.us-east-1.amazonaws.com/smart-inventory-cpp",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ]
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::421596951598:role/LabRole"
+}
